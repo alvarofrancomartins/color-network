@@ -1,6 +1,6 @@
 # Color Co-occurrence Network
 
-Color palettes connect colors and different color palettes may share some of the same colors. Hence, this can be seen as a network. What does that network look like?
+Palettes connect colors. And different palettes can share colors. Therefore, colors that connect different palettes grow a network. What does that network look like?
 
 ![Color co-occurrence network](color_network.png)
 
