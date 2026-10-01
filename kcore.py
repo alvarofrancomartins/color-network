@@ -1,7 +1,8 @@
-"""Build the color co-occurrence network and render it.
+"""Visualize the k-core of the color co-occurrence network.
 
-Two colors are linked when they appear in the same palette.
-Reads palettes.json (from data.py) and writes color_network.png.
+The k-core is the maximal subgraph in which every node has degree >= k:
+nodes are iteratively removed until all remaining have degree >= k.
+Reads palettes.json (from data.py) and writes kcore.png.
 """
 
 import json
@@ -12,13 +13,13 @@ import graph_tool.all as gt
 
 # ---- config ----------------------------------------------------------------
 INPUT = "palettes.json"
-GIANT_ONLY  = True          # keep only the giant connected component
-DROP_HUBS   = None          # e.g. 500 -> drop colors with degree > 500
-SIZE_BY     = "betweenness"      # "degree" | "betweenness"
-SIZE        = dict(mi=2, ma=45, power=0.8)
-BG          = [0.07, 0.07, 0.07, 1.0]
-SEED        = 42
-OUTPUT      = "color_network.png"
+K = 30               # core number: keep nodes with degree >= K
+GIANT_ONLY = False   # keep only the giant component of the k-core
+SIZE_BY = "degree"   # "degree" | "betweenness"
+SIZE = dict(mi=2, ma=45, power=0.8)
+BG = [0.07, 0.07, 0.07, 1.0]
+SEED = 42
+OUTPUT = "kcore.png"
 OUTPUT_SIZE = (3000, 3000)
 NUM_ITERS   = 1000
 
@@ -31,10 +32,15 @@ def main():
     for cs in palettes:
         G.add_edges_from(combinations(cs, 2))
 
+    core = nx.core_number(G)
+    print(f"max core number: {max(core.values())}")
+
+    # k-core: maximal subgraph with min degree >= K
+    G = nx.k_core(G, K)
+    if G.number_of_nodes() == 0:
+        raise SystemExit(f"empty k-core for k={K} (max core number = {max(core.values())})")
     if GIANT_ONLY:
         G = G.subgraph(max(nx.connected_components(G), key=len)).copy()
-    if DROP_HUBS:
-        G.remove_nodes_from([c for c, d in G.degree() if d > DROP_HUBS])
 
     # graph-tool graph (low degree first -> hubs drawn on top)
     nodes = sorted(G, key=lambda c: G.degree(c))
@@ -49,7 +55,7 @@ def main():
                         int(c[5:7], 16) / 255, 1.0] for c in nodes])
 
     central = g.degree_property_map("total") if SIZE_BY == "degree" else gt.betweenness(g)[0]
-    size = gt.prop_to_size(central, **SIZE)   # node size grows with centrality
+    size = gt.prop_to_size(central, **SIZE)
 
     gt.seed_rng(SEED)
     pos = gt.sfdp_layout(g, verbose=False, max_iter = NUM_ITERS)
@@ -61,13 +67,13 @@ def main():
         vertex_size=size,
         vertex_pen_width=0,
         edge_color=[1, 1, 1, 0.04],
-        edge_pen_width=0.3,
+        #edge_pen_width=0.3,
         bg_color=BG,
         output_size=OUTPUT_SIZE,
         adjust_aspect=False,          # honour OUTPUT_SIZE exactly
         output=OUTPUT,
     )
-    print(f"{g.num_vertices()} vertices | {g.num_edges()} edges -> {OUTPUT}")
+    print(f"k-core (k={K}): {g.num_vertices()} vertices | {g.num_edges()} edges -> {OUTPUT}")
 
 
 if __name__ == "__main__":
