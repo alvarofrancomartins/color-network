@@ -1,23 +1,29 @@
 """Statistics of the color co-occurrence network.
 
 Plots:
-  - stats_degree.png                top colors by degree (descending)
-  - stats_betweenness.png           top colors by betweenness (descending)
-  - stats_degree_vs_betweenness.png scatter, one point per color
+  - plots/stats_degree.png                top colors by degree (descending)
+  - plots/stats_betweenness.png           top colors by betweenness (descending)
+  - plots/stats_degree_vs_betweenness.png scatter, one point per color
 
 In every plot, a mark is filled with the color it represents.
-Reads palettes.json (from data.py).
+Reads data/palettes.json (from data.py).
 """
+
+import os
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shared"))  # scripts/shared -> graph.py
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from graph import (betweenness_dict, build_graph, giant_component,
-                   load_palettes, to_graph_tool)
+from graph import (DATA_DIR, PLOTS_DIR, betweenness_dict, build_graph,
+                   giant_component, load_palettes, to_graph_tool)
 
 # ---- config ----------------------------------------------------------------
-INPUT = "palettes.json"
+INPUT = os.path.join(DATA_DIR, "palettes.json")
 TOP = 25
 GIANT_ONLY = True       # rank within the giant component (as rendered in network.py)
 
@@ -138,11 +144,14 @@ def main():
     top_deg = sorted(deg.items(), key=lambda kv: kv[1], reverse=True)[:TOP]
     top_btw = sorted(btw.items(), key=lambda kv: kv[1], reverse=True)[:TOP]
 
-    rank_plot(top_deg, f"Top {TOP} colors by degree", "stats_degree.png",
+    os.makedirs(PLOTS_DIR, exist_ok=True)
+    rank_plot(top_deg, f"Top {TOP} colors by degree",
+              os.path.join(PLOTS_DIR, "stats_degree.png"),
               lambda v: f"{v:,}", "degree")
-    rank_plot(top_btw, f"Top {TOP} colors by betweenness", "stats_betweenness.png",
+    rank_plot(top_btw, f"Top {TOP} colors by betweenness",
+              os.path.join(PLOTS_DIR, "stats_betweenness.png"),
               lambda v: f"{v:.4f}", "betweenness centrality")
-    scatter_plot(deg, btw, "stats_degree_vs_betweenness.png")
+    scatter_plot(deg, btw, os.path.join(PLOTS_DIR, "stats_degree_vs_betweenness.png"))
 
 
 if __name__ == "__main__":

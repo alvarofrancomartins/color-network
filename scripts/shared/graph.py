@@ -1,15 +1,25 @@
 """Shared building blocks for the color co-occurrence network.
 
-Two colors are linked when they appear in the same palette. The scripts
-network.py, kcore.py and stats.py each compose these pieces with their own
-config instead of repeating the graph-building and rendering logic.
+Two colors are linked when they appear in the same palette. The scripts in
+scripts/network/, scripts/stats/ and scripts/palette/ each compose these pieces
+with their own config instead of repeating the graph-building and rendering
+logic.
 """
 
 import json
+import os
 from itertools import combinations
+from pathlib import Path
 
 import networkx as nx
 import graph_tool.all as gt
+
+# Repository layout: data/ (input), plots/ (figures), results/ (generated data),
+# scripts/ (code grouped by goal; this file is the shared module).
+ROOT = str(Path(__file__).resolve().parents[2])  # scripts/shared/ -> repo root
+DATA_DIR = os.path.join(ROOT, "data")
+PLOTS_DIR = os.path.join(ROOT, "plots")
+RESULTS_DIR = os.path.join(ROOT, "results")
 
 
 def load_palettes(path):
@@ -24,6 +34,18 @@ def build_graph(palettes):
     for cs in palettes:
         G.add_edges_from(combinations(cs, 2))
     return G
+
+
+def quantize_color(c, step=16):
+    """Round each RGB channel to a `step` grid -> canonical hex.
+
+    Collapses near-identical encodings of the same color (e.g. #FF8000 and
+    #FF7F00) into one node so they don't masquerade as a "new" pairing.
+    """
+    r = min(255, round(int(c[1:3], 16) / step) * step)
+    g = min(255, round(int(c[3:5], 16) / step) * step)
+    b = min(255, round(int(c[5:7], 16) / step) * step)
+    return f"#{r:02X}{g:02X}{b:02X}"
 
 
 def giant_component(G):

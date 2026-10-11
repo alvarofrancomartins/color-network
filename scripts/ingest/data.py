@@ -1,19 +1,22 @@
 """Fetch pypalettes and save the normalized palettes used by the network.
 
-Output: palettes.json -- a list of palettes, each a sorted, deduped list of
-        7-char uppercase hex colors (alpha byte dropped unless KEEP_ALPHA).
+Output: data/palettes.json -- a list of palettes, each a sorted, deduped list
+        of 7-char uppercase hex colors (alpha byte dropped unless KEEP_ALPHA).
 """
 
 import ast
 import json
+import os
 from importlib.resources import files
+from pathlib import Path
 
 import pandas as pd
 
 # ---- config ----------------------------------------------------------------
 KEEP_ALPHA = False          # True keeps the trailing alpha byte, e.g. #FED789FF
 MIN_SIZE, MAX_SIZE = 2, 50  # skip palettes outside this size range
-OUTPUT = "palettes.json"
+ROOT = str(Path(__file__).resolve().parents[2])  # scripts/ingest/ -> repo root
+OUTPUT = os.path.join(ROOT, "data", "palettes.json")
 
 
 def normalize(s):
@@ -27,6 +30,7 @@ def main():
     palettes = [normalize(s) for s in df["palette"]]
     palettes = [cs for cs in palettes if MIN_SIZE <= len(cs) <= MAX_SIZE]
 
+    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     with open(OUTPUT, "w") as f:
         json.dump(palettes, f)
 
