@@ -9,14 +9,12 @@ In every plot, a mark is filled with the color it represents.
 Reads palettes.json (from data.py).
 """
 
-import json
-from itertools import combinations
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import networkx as nx
-import graph_tool.all as gt
+
+from graph import (betweenness_dict, build_graph, giant_component,
+                   load_palettes, to_graph_tool)
 
 # ---- config ----------------------------------------------------------------
 INPUT = "palettes.json"
@@ -42,26 +40,10 @@ SC_EDGE = "#ffffff"     # thin outline so near-black points stay visible
 SC_ALPHA = 0.85
 
 
-def build_graph(path):
-    with open(path) as f:
-        palettes = json.load(f)
-    G = nx.Graph()
-    for cs in palettes:
-        G.add_edges_from(combinations(cs, 2))
-    if GIANT_ONLY:
-        G = G.subgraph(max(nx.connected_components(G), key=len)).copy()
-    return G
-
-
 def betweenness(G):
-    """Node betweenness via graph-tool (fast)."""
-    nodes = list(G)
-    idx = {c: i for i, c in enumerate(nodes)}
-    g = gt.Graph(directed=False)
-    g.add_vertex(len(nodes))
-    g.add_edge_list([(idx[u], idx[v]) for u, v in G.edges()])
-    vb, _ = gt.betweenness(g)
-    return {c: vb[idx[c]] for c in nodes}
+    """Node betweenness via graph-tool (fast), as {color: value}."""
+    g, nodes, idx = to_graph_tool(G)
+    return betweenness_dict(g, nodes, idx)
 
 
 def rank_plot(pairs, title, path, fmt, xlabel):
@@ -145,7 +127,10 @@ def scatter_plot(deg, btw, path):
 
 
 def main():
-    G = build_graph(INPUT)
+    palettes = load_palettes(INPUT)
+    G = build_graph(palettes)
+    if GIANT_ONLY:
+        G = giant_component(G)
 
     deg = dict(G.degree())
     btw = betweenness(G)
