@@ -44,8 +44,14 @@ def proj_raw(pt):
     return lon * math.cos(math.radians(LAT_CENTER)), -lat  # y flips for SVG
 
 
-def build_rows():
-    """Return ([(path_d, color_index), ...], viewbox) for the Paraná map."""
+def project():
+    """Return (rings, color, viewbox) for the Paraná map.
+
+    ``rings[i]`` is municipality i's list of ``(is_hole, [(x, y), ...])`` rings
+    in projected SVG coordinates (y points down); ``color[i]`` is its 0-based
+    band index from the leaned strips (five equal bands); ``viewbox`` fits the
+    whole state. Shared by the HTML page (build_rows) and the PNG renderer.
+    """
     data = json.load(open(GEOJSON))
     feats = [f for f in data["features"] if f["geometry"] is not None]
     geoms = [shape(f["geometry"]).simplify(SIMPLIFY, preserve_topology=True) for f in feats]
@@ -59,9 +65,11 @@ def build_rows():
     u = [(x - min(xs)) / (max(xs) - min(xs)) for x in xs]
     v = [(y - min(ys)) / (max(ys) - min(ys)) for y in ys]
     order = sorted(range(n), key=lambda i: u[i] + TILT * v[i])
-    color = [min(N_COLORS - 1, rank * N_COLORS // n) for rank, i in enumerate(order)]
+    color = [0] * n
+    for rank, i in enumerate(order):
+        color[i] = min(N_COLORS - 1, rank * N_COLORS // n)
 
-    # first pass: bounding box
+    # bounding box (projected)
     minx = miny = float("inf")
     maxx = maxy = float("-inf")
     for g in geoms:
@@ -78,21 +86,30 @@ def build_rows():
         x, y = proj_raw(pt)
         return (x - minx) * scale + MARGIN, (y - miny) * scale + MARGIN
 
-    def ring(coords):
-        cs = [tf(pt) for pt in coords]
+    rings = []
+    for g in geoms:
+        grings = []
+        for poly in polygons(g):
+            grings.append((False, [tf(pt) for pt in poly.exterior.coords]))
+            for hole in poly.interiors:
+                grings.append((True, [tf(pt) for pt in hole.coords]))
+        rings.append(grings)
+
+    return rings, color, viewbox
+
+
+def build_rows():
+    """Return ([(path_d, color_index), ...], viewbox) for the Paraná map."""
+    rings, color, viewbox = project()
+
+    def ring_str(coords):
+        cs = [p for p in coords]
         if cs and cs[0] == cs[-1]:
             cs = cs[:-1]
         return "M" + " ".join(f"{x:.1f},{y:.1f}" for x, y in cs) + "Z"
 
-    def path_d(g):
-        d = ""
-        for poly in polygons(g):
-            d += ring(poly.exterior.coords)
-            for hole in poly.interiors:
-                d += ring(hole.coords)
-        return d
-
-    rows = [(path_d(g), color[i]) for i, g in enumerate(geoms)]
+    rows = [("".join(ring_str(cs) for _, cs in g), color[i])
+            for i, g in enumerate(rings)]
     return rows, viewbox
 
 
