@@ -1,0 +1,388 @@
+{
+  "source_files": [
+    "selected_palettes_1.json",
+    "selected_palettes_2.json",
+    "selected_palettes_3.json"
+  ],
+  "min_files": 3,
+  "common_palettes": [
+    {
+      "index": 10,
+      "colors": [
+        "#E06040",
+        "#FFE0A0",
+        "#303040",
+        "#A0D0FF",
+        "#406040"
+      ],
+      "seed": [
+        "#E06040",
+        "#FFE0A0"
+      ],
+      "score": 0.2977,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 28,
+      "colors": [
+        "#303040",
+        "#806040",
+        "#A0C0E0",
+        "#F0E0C0",
+        "#E06040"
+      ],
+      "seed": [
+        "#303040",
+        "#806040"
+      ],
+      "score": 0.2677,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 47,
+      "colors": [
+        "#404050",
+        "#80A0C0",
+        "#FFC0A0",
+        "#608050",
+        "#D04070"
+      ],
+      "seed": [
+        "#404050",
+        "#80A0C0"
+      ],
+      "score": 0.2466,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 51,
+      "colors": [
+        "#202040",
+        "#E06040",
+        "#C0E0FF",
+        "#502030",
+        "#A08070"
+      ],
+      "seed": [
+        "#202040",
+        "#E06040"
+      ],
+      "score": 0.246,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 52,
+      "colors": [
+        "#C04040",
+        "#FFFFA0",
+        "#304060",
+        "#6090FF",
+        "#506020"
+      ],
+      "seed": [
+        "#C04040",
+        "#FFFFA0"
+      ],
+      "score": 0.2454,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 55,
+      "colors": [
+        "#807040",
+        "#C0B0A0",
+        "#7080A0",
+        "#709070",
+        "#F0C040"
+      ],
+      "seed": [
+        "#807040",
+        "#C0B0A0"
+      ],
+      "score": 0.2445,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 59,
+      "colors": [
+        "#603020",
+        "#806040",
+        "#304060",
+        "#304030",
+        "#F0E0C0"
+      ],
+      "seed": [
+        "#603020",
+        "#806040"
+      ],
+      "score": 0.2399,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 62,
+      "colors": [
+        "#E0A060",
+        "#FFFFA0",
+        "#303060",
+        "#804000",
+        "#60A0E0"
+      ],
+      "seed": [
+        "#E0A060",
+        "#FFFFA0"
+      ],
+      "score": 0.2395,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 68,
+      "colors": [
+        "#80C0E0",
+        "#C08040",
+        "#206080",
+        "#FFE0B0",
+        "#E00000"
+      ],
+      "seed": [
+        "#80C0E0",
+        "#C08040"
+      ],
+      "score": 0.2377,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 69,
+      "colors": [
+        "#806040",
+        "#E04040",
+        "#606080",
+        "#209060",
+        "#C0FF70"
+      ],
+      "seed": [
+        "#806040",
+        "#E04040"
+      ],
+      "score": 0.2357,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 74,
+      "colors": [
+        "#404030",
+        "#E0C090",
+        "#E05020",
+        "#704040",
+        "#90A080"
+      ],
+      "seed": [
+        "#404030",
+        "#E0C090"
+      ],
+      "score": 0.2341,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 75,
+      "colors": [
+        "#305020",
+        "#A03030",
+        "#A0C060",
+        "#104030",
+        "#606010"
+      ],
+      "seed": [
+        "#305020",
+        "#A03030"
+      ],
+      "score": 0.2338,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 76,
+      "colors": [
+        "#FF6060",
+        "#FFD080",
+        "#204040",
+        "#70F0E0",
+        "#506020"
+      ],
+      "seed": [
+        "#FF6060",
+        "#FFD080"
+      ],
+      "score": 0.2327,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 77,
+      "colors": [
+        "#402020",
+        "#FFD000",
+        "#8090A0",
+        "#FFFFA0",
+        "#304030"
+      ],
+      "seed": [
+        "#402020",
+        "#FFD000"
+      ],
+      "score": 0.2325,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 79,
+      "colors": [
+        "#C0E0FF",
+        "#FF6060",
+        "#203060",
+        "#A070A0",
+        "#806040"
+      ],
+      "seed": [
+        "#C0E0FF",
+        "#FF6060"
+      ],
+      "score": 0.2324,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 80,
+      "colors": [
+        "#80A090",
+        "#D0C090",
+        "#403020",
+        "#A09030",
+        "#D08050"
+      ],
+      "seed": [
+        "#80A090",
+        "#D0C090"
+      ],
+      "score": 0.232,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 93,
+      "colors": [
+        "#303040",
+        "#FFC080",
+        "#B090A0",
+        "#803030",
+        "#FF8010"
+      ],
+      "seed": [
+        "#303040",
+        "#FFC080"
+      ],
+      "score": 0.2272,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    },
+    {
+      "index": 99,
+      "colors": [
+        "#604020",
+        "#FFE0A0",
+        "#B0C0E0",
+        "#F0A000",
+        "#303060"
+      ],
+      "seed": [
+        "#604020",
+        "#FFE0A0"
+      ],
+      "score": 0.2256,
+      "count": 3,
+      "files": [
+        "selected_palettes_1.json",
+        "selected_palettes_2.json",
+        "selected_palettes_3.json"
+      ]
+    }
+  ]
+}

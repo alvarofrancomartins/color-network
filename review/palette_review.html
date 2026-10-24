@@ -1,0 +1,599 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Palette Review</title>
+<style>
+  /* Layout: a neutral judging stage — one palette shown as specimen chips on a
+     gallery-grey bench, nothing else visible so each is judged in isolation. */
+  :root {
+    --bg: #E9E8E4;
+    --fg: #191919;
+    --muted: #6E6A63;
+    --surface: #F5F4F1;
+    --border: #CFCCC4;
+    --accent: #3B5BDB;
+    --like: #2F9E44;
+    --dislike: #D63333;
+    --btn: #6E6E6E;
+    --chip-border: rgba(0,0,0,0.14);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1B1D;
+      --fg: #ECECEA;
+      --muted: #9C988F;
+      --surface: #242427;
+      --border: #3A3A3F;
+      --accent: #7C93FF;
+      --like: #3FBF5F;
+      --dislike: #FF6B6B;
+      --chip-border: rgba(255,255,255,0.18);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1B1D;
+    --fg: #ECECEA;
+    --muted: #9C988F;
+    --surface: #242427;
+    --border: #3A3A3F;
+    --accent: #7C93FF;
+    --like: #3FBF5F;
+    --dislike: #FF6B6B;
+    --chip-border: rgba(255,255,255,0.18);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-top: 24px;
+    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- header ---- */
+  header .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .stats {
+    display: flex;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 14px;
+  }
+  .bar > div {
+    height: 100%;
+    background: var(--accent);
+    width: 0;
+    transition: width 0.25s ease;
+  }
+
+  /* ---- review stage ---- */
+  #review {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0 24px;
+  }
+  .index-line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .index {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: clamp(56px, 16vw, 92px);
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .index-total {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 20px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .swatches {
+    display: flex;
+    gap: 14px;
+    margin-top: 26px;
+  }
+  .swatch {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chip {
+    aspect-ratio: 1;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--chip-border);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .hex {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: clamp(11px, 2.6vw, 14px);
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+  .hint {
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .hint kbd {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 1px 6px;
+    color: var(--fg);
+  }
+
+  /* ---- controls ---- */
+  .controls {
+    display: flex;
+    gap: 14px;
+    margin-top: 30px;
+  }
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.06s ease, filter 0.12s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .btn.dislike { background: var(--btn); }
+  .btn.like { background: var(--btn); }
+  .btn.active { filter: brightness(1.18); box-shadow: 0 0 0 2px var(--fg) inset; }
+  .sub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+  }
+  .textbtn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .textbtn:hover { color: var(--fg); }
+  .textbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .textbtn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ---- results ---- */
+  #results { flex: 1; display: flex; flex-direction: column; padding: 40px 0 24px; }
+  .res-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .res-count { font-size: 20px; font-weight: 600; }
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .result-num {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .result-strip { display: flex; gap: 5px; }
+  .result-chip { flex: 1; aspect-ratio: 1; border-radius: 5px; border: 1px solid var(--chip-border); }
+  .empty { color: var(--muted); font-size: 15px; margin-top: 24px; max-width: 40ch; }
+  .results-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .btn.primary { background: var(--accent); flex: 0 0 auto; padding: 13px 22px; }
+  .btn.ghost { background: var(--surface); color: var(--fg); border: 1px solid var(--border); flex: 0 0 auto; padding: 13px 22px; }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .res-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+  .save-status { margin-top: 12px; font-size: 14px; color: var(--muted); min-height: 1.2em; }
+  .save-status.ok { color: var(--like); }
+  .save-status.err { color: var(--dislike); }
+
+  /* ---- toast ---- */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(22px, env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px);
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 20;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 460px) {
+    .swatches { gap: 8px; }
+    .controls { gap: 10px; }
+    .btn { padding: 14px 10px; font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="row">
+      <h1>Palette Review</h1>
+      <div class="stats">
+        <span id="hdr-position"></span>
+        <span id="hdr-liked"></span>
+        <span id="hdr-disliked"></span>
+      </div>
+    </div>
+    <div class="bar"><div id="bar-fill"></div></div>
+  </header>
+
+  <section id="review">
+    <div class="index-line">
+      <span class="index" id="index-num"></span>
+      <span class="index-total" id="index-total"></span>
+    </div>
+    <div class="swatches" id="swatches"></div>
+    <div class="hint">
+      <kbd>&larr;</kbd> or <kbd>D</kbd> dislike &nbsp;&middot;&nbsp;
+      <kbd>&rarr;</kbd> or <kbd>L</kbd> like &nbsp;&middot;&nbsp;
+      <kbd>Backspace</kbd> back
+    </div>
+    <div class="controls">
+      <button class="btn dislike" id="btn-dislike">Dislike</button>
+      <button class="btn like" id="btn-like">Like</button>
+    </div>
+    <div class="sub">
+      <button class="textbtn" id="btn-back" disabled>&larr; Back</button>
+      <button class="textbtn" id="btn-finish">Finish early</button>
+    </div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="res-head">
+      <span class="res-count" id="res-count"></span>
+      <div class="res-buttons">
+        <button class="btn primary" id="btn-save">Save to results/</button>
+        <button class="btn ghost" id="btn-copy">Copy JSON</button>
+      </div>
+    </div>
+    <div class="save-status" id="save-status" role="status"></div>
+    <div class="results-grid" id="results-grid"></div>
+    <div class="results-actions">
+      <button class="textbtn" id="btn-review">&larr; Keep reviewing</button>
+      <button class="textbtn" id="btn-restart">Start over</button>
+    </div>
+  </section>
+</div>
+
+<textarea id="copybuf" hidden></textarea>
+<div id="toast" role="status"></div>
+
+<script>
+const PALETTES = [{"i":1,"colors":["#404060","#E06040","#406040","#C0E0FF","#604030"],"seed":["#404060","#E06040"],"score":0.4398},{"i":2,"colors":["#404060","#FFE0A0","#902000","#504040","#406040"],"seed":["#404060","#FFE0A0"],"score":0.4301},{"i":3,"colors":["#E0A040","#FFE0A0","#405080","#502010","#806060"],"seed":["#E0A040","#FFE0A0"],"score":0.3719},{"i":4,"colors":["#C0A040","#FFE0A0","#303040","#60A0E0","#406040"],"seed":["#C0A040","#FFE0A0"],"score":0.3602},{"i":5,"colors":["#C0E0FF","#FFFF00","#000080","#F050D0","#FFFFA0"],"seed":["#C0E0FF","#FFFF00"],"score":0.3591},{"i":6,"colors":["#404060","#C0A040","#406040","#402020","#70A0E0"],"seed":["#404060","#C0A040"],"score":0.3289},{"i":7,"colors":["#FFC050","#FFE0A0","#206080","#506020","#90B0C0"],"seed":["#FFC050","#FFE0A0"],"score":0.3239},{"i":8,"colors":["#B080C0","#C0E0FF","#806040","#F050D0","#7090B0"],"seed":["#B080C0","#C0E0FF"],"score":0.3012},{"i":9,"colors":["#302020","#FFE0A0","#4090D0","#A06000","#706080"],"seed":["#302020","#FFE0A0"],"score":0.3011},{"i":10,"colors":["#E06040","#FFE0A0","#303040","#A0D0FF","#406040"],"seed":["#E06040","#FFE0A0"],"score":0.2977},{"i":11,"colors":["#5050FF","#C050D0","#800080","#0000C0","#F0B0E0"],"seed":["#5050FF","#C050D0"],"score":0.2952},{"i":12,"colors":["#404060","#806060","#FFC030","#306040","#A0B0C0"],"seed":["#404060","#806060"],"score":0.2917},{"i":13,"colors":["#90A0C0","#FFE0A0","#A01000","#202040","#807040"],"seed":["#90A0C0","#FFE0A0"],"score":0.2885},{"i":14,"colors":["#50A0FF","#B080C0","#802010","#B000E0","#604060"],"seed":["#50A0FF","#B080C0"],"score":0.2876},{"i":15,"colors":["#0000FF","#F0B0E0","#C0E0FF","#F01080","#7000A0"],"seed":["#0000FF","#F0B0E0"],"score":0.2854},{"i":16,"colors":["#404060","#FFA000","#FFFFC0","#0050B0","#D0E0FF"],"seed":["#404060","#FFA000"],"score":0.2826},{"i":17,"colors":["#C050D0","#C0E0FF","#0000FF","#F0B0E0","#50A0FF"],"seed":["#C050D0","#C0E0FF"],"score":0.2815},{"i":18,"colors":["#FFC050","#FFFFA0","#404080","#406020","#800000"],"seed":["#FFC050","#FFFFA0"],"score":0.2803},{"i":19,"colors":["#C0E0FF","#FF0000","#000080","#FFFFA0","#0000FF"],"seed":["#C0E0FF","#FF0000"],"score":0.2795},{"i":20,"colors":["#202030","#806040","#304030","#5080A0","#FFE080"],"seed":["#202030","#806040"],"score":0.2789},{"i":21,"colors":["#606080","#E06040","#406040","#80C0FF","#604030"],"seed":["#606080","#E06040"],"score":0.2789},{"i":22,"colors":["#603030","#FFE0A0","#0080D0","#404070","#80D0FF"],"seed":["#603030","#FFE0A0"],"score":0.2781},{"i":23,"colors":["#9090FF","#B000E0","#007040","#000080","#F0B0E0"],"seed":["#9090FF","#B000E0"],"score":0.2772},{"i":24,"colors":["#F0B0E0","#FF8000","#50A0FF","#7000A0","#F050D0"],"seed":["#F0B0E0","#FF8000"],"score":0.2738},{"i":25,"colors":["#E090FF","#FF8000","#7000A0","#50A0FF","#F01080"],"seed":["#E090FF","#FF8000"],"score":0.2738},{"i":26,"colors":["#A00000","#FFC080","#0040A0","#402020","#B080A0"],"seed":["#A00000","#FFC080"],"score":0.2717},{"i":27,"colors":["#FFC0C0","#FFE0A0","#006000","#602060","#A06020"],"seed":["#FFC0C0","#FFE0A0"],"score":0.2704},{"i":28,"colors":["#303040","#806040","#A0C0E0","#F0E0C0","#E06040"],"seed":["#303040","#806040"],"score":0.2677},{"i":29,"colors":["#303040","#8090A0","#F08020","#706050","#F0E0C0"],"seed":["#303040","#8090A0"],"score":0.2667},{"i":30,"colors":["#00C000","#5050FF","#800080","#F050D0","#0000C0"],"seed":["#00C000","#5050FF"],"score":0.266},{"i":31,"colors":["#806040","#FFE050","#203060","#80E0C0","#105020"],"seed":["#806040","#FFE050"],"score":0.2657},{"i":32,"colors":["#5050FF","#FFFF00","#800080","#008080","#F0E080"],"seed":["#5050FF","#FFFF00"],"score":0.2655},{"i":33,"colors":["#806000","#806020","#FFE0A0","#409040","#A0E040"],"seed":["#806000","#806020"],"score":0.2654},{"i":34,"colors":["#000080","#F050D0","#00FF00","#C0E0FF","#FF8000"],"seed":["#000080","#F050D0"],"score":0.2643},{"i":35,"colors":["#FFC0C0","#FFD060","#006000","#602060","#602000"],"seed":["#FFC0C0","#FFD060"],"score":0.2626},{"i":36,"colors":["#404060","#FFFFA0","#A01000","#C0E0FF","#402020"],"seed":["#404060","#FFFFA0"],"score":0.2563},{"i":37,"colors":["#404060","#FFE080","#302020","#A01000","#C0E0FF"],"seed":["#404060","#FFE080"],"score":0.2558},{"i":38,"colors":["#E0C090","#FFE000","#000010","#50A0F0","#405040"],"seed":["#E0C090","#FFE000"],"score":0.2528},{"i":39,"colors":["#00C000","#C0E0FF","#000080","#F050D0","#A00000"],"seed":["#00C000","#C0E0FF"],"score":0.2523},{"i":40,"colors":["#B000E0","#C0E0FF","#F0B0E0","#A00000","#000080"],"seed":["#B000E0","#C0E0FF"],"score":0.2515},{"i":41,"colors":["#5050FF","#B000E0","#F0B0E0","#000080","#F050D0"],"seed":["#5050FF","#B000E0"],"score":0.2515},{"i":42,"colors":["#806040","#FFE090","#7090C0","#E00000","#203060"],"seed":["#806040","#FFE090"],"score":0.2506},{"i":43,"colors":["#404060","#A08060","#80B0E0","#D0A020","#402020"],"seed":["#404060","#A08060"],"score":0.2498},{"i":44,"colors":["#FFA070","#FFFFA0","#A0C0F0","#506020","#A01000"],"seed":["#FFA070","#FFFFA0"],"score":0.2495},{"i":45,"colors":["#5050FF","#FF0000","#008080","#800080","#A06000"],"seed":["#5050FF","#FF0000"],"score":0.2489},{"i":46,"colors":["#9090FF","#C050D0","#800080","#F0B0E0","#50A0FF"],"seed":["#9090FF","#C050D0"],"score":0.2486},{"i":47,"colors":["#404050","#80A0C0","#FFC0A0","#608050","#D04070"],"seed":["#404050","#80A0C0"],"score":0.2466},{"i":48,"colors":["#E0A020","#FFE0A0","#202040","#506020","#7090A0"],"seed":["#E0A020","#FFE0A0"],"score":0.2465},{"i":49,"colors":["#502000","#FFB0E0","#C0F0F0","#401070","#E07000"],"seed":["#502000","#FFB0E0"],"score":0.2464},{"i":50,"colors":["#C08010","#FFE0A0","#90C0E0","#806040","#FFB050"],"seed":["#C08010","#FFE0A0"],"score":0.2463},{"i":51,"colors":["#202040","#E06040","#C0E0FF","#502030","#A08070"],"seed":["#202040","#E06040"],"score":0.246},{"i":52,"colors":["#C04040","#FFFFA0","#304060","#6090FF","#506020"],"seed":["#C04040","#FFFFA0"],"score":0.2454},{"i":53,"colors":["#806040","#E0C040","#C0E0FF","#203060","#FFFFA0"],"seed":["#806040","#E0C040"],"score":0.2451},{"i":54,"colors":["#00C000","#9090FF","#800080","#F050D0","#007040"],"seed":["#00C000","#9090FF"],"score":0.245},{"i":55,"colors":["#807040","#C0B0A0","#7080A0","#709070","#F0C040"],"seed":["#807040","#C0B0A0"],"score":0.2445},{"i":56,"colors":["#C08040","#FFFFA0","#000010","#A0A0E0","#402020"],"seed":["#C08040","#FFFFA0"],"score":0.2438},{"i":57,"colors":["#FFD000","#FFD0A0","#0030A0","#302030","#D0FFFF"],"seed":["#FFD000","#FFD0A0"],"score":0.2426},{"i":58,"colors":["#A0D0E0","#F0D040","#003070","#805070","#60A050"],"seed":["#A0D0E0","#F0D040"],"score":0.2417},{"i":59,"colors":["#603020","#806040","#304060","#304030","#F0E0C0"],"seed":["#603020","#806040"],"score":0.2399},{"i":60,"colors":["#FFE080","#FFE0C0","#100000","#4060A0","#A04060"],"seed":["#FFE080","#FFE0C0"],"score":0.2398},{"i":61,"colors":["#D0FFFF","#FFE0A0","#602000","#0060D0","#FFFF00"],"seed":["#D0FFFF","#FFE0A0"],"score":0.2397},{"i":62,"colors":["#E0A060","#FFFFA0","#303060","#804000","#60A0E0"],"seed":["#E0A060","#FFFFA0"],"score":0.2395},{"i":63,"colors":["#102040","#8090A0","#C0B0A0","#701020","#F0F050"],"seed":["#102040","#8090A0"],"score":0.239},{"i":64,"colors":["#604030","#E0C0A0","#406090","#100000","#E0B040"],"seed":["#604030","#E0C0A0"],"score":0.2388},{"i":65,"colors":["#00C000","#F0B0E0","#B000E0","#90C0FF","#C050D0"],"seed":["#00C000","#F0B0E0"],"score":0.2379},{"i":66,"colors":["#00C000","#E090FF","#B000E0","#50A0FF","#F050D0"],"seed":["#00C000","#E090FF"],"score":0.2379},{"i":67,"colors":["#A0A0C0","#FFA080","#800000","#70C070","#706030"],"seed":["#A0A0C0","#FFA080"],"score":0.2377},{"i":68,"colors":["#80C0E0","#C08040","#206080","#FFE0B0","#E00000"],"seed":["#80C0E0","#C08040"],"score":0.2377},{"i":69,"colors":["#806040","#E04040","#606080","#209060","#C0FF70"],"seed":["#806040","#E04040"],"score":0.2357},{"i":70,"colors":["#606080","#FFE0A0","#202010","#0060D0","#FFE000"],"seed":["#606080","#FFE0A0"],"score":0.2356},{"i":71,"colors":["#0040A0","#C01030","#202030","#7040C0","#102040"],"seed":["#0040A0","#C01030"],"score":0.2351},{"i":72,"colors":["#C0A050","#FFE060","#606080","#403000","#60A0E0"],"seed":["#C0A050","#FFE060"],"score":0.235},{"i":73,"colors":["#C04080","#FF6060","#100020","#506020","#C0B0E0"],"seed":["#C04080","#FF6060"],"score":0.2341},{"i":74,"colors":["#404030","#E0C090","#E05020","#704040","#90A080"],"seed":["#404030","#E0C090"],"score":0.2341},{"i":75,"colors":["#305020","#A03030","#A0C060","#104030","#606010"],"seed":["#305020","#A03030"],"score":0.2338},{"i":76,"colors":["#FF6060","#FFD080","#204040","#70F0E0","#506020"],"seed":["#FF6060","#FFD080"],"score":0.2327},{"i":77,"colors":["#402020","#FFD000","#8090A0","#FFFFA0","#304030"],"seed":["#402020","#FFD000"],"score":0.2325},{"i":78,"colors":["#0000FF","#FFA030","#D0FFFF","#FFFFD0","#00A000"],"seed":["#0000FF","#FFA030"],"score":0.2325},{"i":79,"colors":["#C0E0FF","#FF6060","#203060","#A070A0","#806040"],"seed":["#C0E0FF","#FF6060"],"score":0.2324},{"i":80,"colors":["#80A090","#D0C090","#403020","#A09030","#D08050"],"seed":["#80A090","#D0C090"],"score":0.232},{"i":81,"colors":["#402020","#C0C060","#60A0A0","#E04060","#406020"],"seed":["#402020","#C0C060"],"score":0.2316},{"i":82,"colors":["#002040","#204060","#FFA000","#70B0E0","#802000"],"seed":["#002040","#204060"],"score":0.2316},{"i":83,"colors":["#404060","#FFC0C0","#004060","#A06020","#A0B0C0"],"seed":["#404060","#FFC0C0"],"score":0.2306},{"i":84,"colors":["#402020","#E08040","#608090","#C0C0A0","#804020"],"seed":["#402020","#E08040"],"score":0.2303},{"i":85,"colors":["#004040","#800040","#A0D060","#306010","#105030"],"seed":["#004040","#800040"],"score":0.2303},{"i":86,"colors":["#404050","#4070A0","#E08020","#506050","#C08090"],"seed":["#404050","#4070A0"],"score":0.2302},{"i":87,"colors":["#F0E0A0","#FFD060","#404060","#504040","#705010"],"seed":["#F0E0A0","#FFD060"],"score":0.2302},{"i":88,"colors":["#303040","#FFE090","#302010","#A0C0E0","#102030"],"seed":["#303040","#FFE090"],"score":0.2298},{"i":89,"colors":["#403030","#FFD000","#8090A0","#FFE0A0","#803020"],"seed":["#403030","#FFD000"],"score":0.2287},{"i":90,"colors":["#C01030","#FFC080","#B0C0E0","#002070","#60A050"],"seed":["#C01030","#FFC080"],"score":0.2284},{"i":91,"colors":["#FF6060","#FFE0A0","#B0E0FF","#602000","#806060"],"seed":["#FF6060","#FFE0A0"],"score":0.2276},{"i":92,"colors":["#402010","#705040","#506050","#F0C050","#201020"],"seed":["#402010","#705040"],"score":0.2275},{"i":93,"colors":["#303040","#FFC080","#B090A0","#803030","#FF8010"],"seed":["#303040","#FFC080"],"score":0.2272},{"i":94,"colors":["#404060","#FFA080","#902000","#A0C0E0","#806040"],"seed":["#404060","#FFA080"],"score":0.2268},{"i":95,"colors":["#E0A000","#FFFFA0","#A0A0D0","#807040","#60C030"],"seed":["#E0A000","#FFFFA0"],"score":0.2267},{"i":96,"colors":["#808060","#FFD0A0","#2090A0","#A00000","#A0E0A0"],"seed":["#808060","#FFD0A0"],"score":0.2265},{"i":97,"colors":["#A0A0C0","#FFC0C0","#901000","#C0A040","#E0B0E0"],"seed":["#A0A0C0","#FFC0C0"],"score":0.2263},{"i":98,"colors":["#202030","#FFD060","#302010","#4090D0","#504040"],"seed":["#202030","#FFD060"],"score":0.2259},{"i":99,"colors":["#604020","#FFE0A0","#B0C0E0","#F0A000","#303060"],"seed":["#604020","#FFE0A0"],"score":0.2256},{"i":100,"colors":["#C08010","#F0E0C0","#20B0B0","#E0A0FF","#403020"],"seed":["#C08010","#F0E0C0"],"score":0.2252}];
+const KEY = "palette-review-v1";
+const SAVE_URL = location.protocol === "file:" ? "http://localhost:8000/save" : "/save";
+const N = PALETTES.length;
+let votes = {};          // index -> "like" | "dislike"
+let pos = 0;
+let showingResults = false;
+
+const $ = (id) => document.getElementById(id);
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const o = JSON.parse(raw);
+      if (o && typeof o === "object") {
+        if (o.votes) votes = o.votes;
+        if (typeof o.pos === "number") pos = o.pos;
+      }
+    }
+  } catch (e) {}
+  pos = Math.max(0, Math.min(pos, N - 1));
+}
+
+function saveState() {
+  try { localStorage.setItem(KEY, JSON.stringify({ votes, pos })); } catch (e) {}
+}
+
+function counts() {
+  let like = 0, dislike = 0;
+  for (const v of Object.values(votes)) {
+    if (v === "like") like++;
+    else if (v === "dislike") dislike++;
+  }
+  return { like, dislike };
+}
+
+function updateHeader() {
+  const c = counts();
+  $("hdr-position").textContent = (pos + 1) + " of " + N;
+  $("hdr-liked").textContent = c.like + " liked";
+  $("hdr-disliked").textContent = c.dislike + " disliked";
+  $("bar-fill").style.width = ((Object.keys(votes).length / N) * 100) + "%";
+}
+
+function renderReview() {
+  showingResults = false;
+  $("review").hidden = false;
+  $("results").hidden = true;
+
+  const p = PALETTES[pos];
+  $("index-num").textContent = String(pos + 1).padStart(2, "0");
+  $("index-total").textContent = "/ " + N;
+
+  const wrap = $("swatches");
+  wrap.innerHTML = "";
+  p.colors.forEach((c) => {
+    const sw = document.createElement("div");
+    sw.className = "swatch";
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.style.background = c;
+    const hex = document.createElement("div");
+    hex.className = "hex";
+    hex.textContent = c;
+    sw.append(chip, hex);
+    wrap.append(sw);
+  });
+
+  const cur = votes[PALETTES[pos].i];
+  $("btn-like").classList.toggle("active", cur === "like");
+  $("btn-dislike").classList.toggle("active", cur === "dislike");
+  $("btn-back").disabled = pos === 0;
+  updateHeader();
+}
+
+function vote(action) {
+  votes[PALETTES[pos].i] = action;
+  saveState();
+  if (lastSavedFile !== null) resetSaveButton();
+  if (pos < N - 1) {
+    pos++;
+    renderReview();
+  } else {
+    renderResults();
+  }
+}
+
+function back() {
+  if (pos > 0) {
+    pos--;
+    saveState();
+    renderReview();
+  }
+}
+
+function renderResults() {
+  showingResults = true;
+  $("review").hidden = true;
+  $("results").hidden = false;
+
+  const liked = PALETTES.filter((p) => votes[p.i] === "like");
+  $("res-count").textContent = liked.length + " of " + N + " liked";
+
+  const grid = $("results-grid");
+  grid.innerHTML = "";
+  if (liked.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "Nothing liked yet. Go back and mark the palettes you like.";
+    grid.append(empty);
+  } else {
+    liked.forEach((p) => {
+      const card = document.createElement("div");
+      card.className = "result-card";
+      const num = document.createElement("div");
+      num.className = "result-num";
+      num.textContent = "No. " + p.i;
+      const strip = document.createElement("div");
+      strip.className = "result-strip";
+      p.colors.forEach((c) => {
+        const s = document.createElement("div");
+        s.className = "result-chip";
+        s.style.background = c;
+        strip.append(s);
+      });
+      card.append(num, strip);
+      grid.append(card);
+    });
+  }
+  updateHeader();
+}
+
+function likedJSON() {
+  return PALETTES
+    .filter((p) => votes[p.i] === "like")
+    .map((p) => ({ index: p.i, colors: p.colors, seed: p.seed, score: p.score }));
+}
+
+async function copyResults() {
+  const txt = JSON.stringify(likedJSON(), null, 2);
+  try {
+    await navigator.clipboard.writeText(txt);
+    toast("Copied " + likedJSON().length + " liked palettes");
+  } catch (e) {
+    const buf = $("copybuf");
+    buf.value = txt;
+    buf.hidden = false;
+    buf.select();
+    try {
+      document.execCommand("copy");
+      toast("Copied to clipboard");
+    } catch (e2) {
+      toast("Copy blocked — select and copy the text");
+    }
+    buf.hidden = true;
+  }
+}
+
+let lastSavedFile = null;
+
+function setSaveStatus(msg, cls) {
+  const el = $("save-status");
+  el.textContent = msg;
+  el.className = "save-status" + (cls ? " " + cls : "");
+}
+
+async function saveResults() {
+  const palettes = likedJSON();
+  if (palettes.length === 0) {
+    setSaveStatus("Nothing liked to save.", "err");
+    return;
+  }
+  const btn = $("btn-save");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  setSaveStatus("Saving…", "");
+  try {
+    const res = await fetch(SAVE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ palettes }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || ("HTTP " + res.status));
+    }
+    const data = await res.json();
+    lastSavedFile = data.file;
+    setSaveStatus("Saved " + data.count + " liked palettes → " + data.file, "ok");
+    btn.textContent = "Saved ✓";
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Save to results/";
+    setSaveStatus(
+      "Could not save — start the server (python scripts/palette/review_server.py) and open http://localhost:8000",
+      "err"
+    );
+  }
+}
+
+function resetSaveButton() {
+  lastSavedFile = null;
+  const btn = $("btn-save");
+  btn.disabled = false;
+  btn.textContent = "Save to results/";
+  setSaveStatus("", "");
+}
+
+function startOver() {
+  votes = {};
+  pos = 0;
+  saveState();
+  resetSaveButton();
+  renderReview();
+}
+
+function goBack() {
+  pos = Math.min(pos, N - 1);
+  renderReview();
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function onKey(e) {
+  if (showingResults || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === "ArrowRight" || k.toLowerCase() === "l") {
+    e.preventDefault();
+    vote("like");
+  } else if (k === "ArrowLeft" || k.toLowerCase() === "d") {
+    e.preventDefault();
+    vote("dislike");
+  } else if (k === "Backspace") {
+    e.preventDefault();
+    back();
+  }
+}
+
+function init() {
+  loadState();
+  if (Object.keys(votes).length === N) renderResults();
+  else renderReview();
+
+  $("btn-like").onclick = () => vote("like");
+  $("btn-dislike").onclick = () => vote("dislike");
+  $("btn-back").onclick = back;
+  $("btn-finish").onclick = renderResults;
+  $("btn-copy").onclick = copyResults;
+  $("btn-save").onclick = saveResults;
+  $("btn-review").onclick = goBack;
+  $("btn-restart").onclick = startOver;
+  window.addEventListener("keydown", onKey);
+}
+
+init();
+</script>

@@ -14,7 +14,7 @@ from pathlib import Path
 import networkx as nx
 import graph_tool.all as gt
 
-# Repository layout: data/ (input), plots/ (figures), results/ (generated data),
+# Repository layout: data/ (input), plots/ (figures + maps), results/ (generated data),
 # scripts/ (code grouped by goal; this file is the shared module).
 ROOT = str(Path(__file__).resolve().parents[2])  # scripts/shared/ -> repo root
 DATA_DIR = os.path.join(ROOT, "data")

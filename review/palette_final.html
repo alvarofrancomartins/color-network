@@ -1,0 +1,615 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Final Palette Selection</title>
+<style>
+  /* Layout: a neutral judging stage — one palette shown as specimen chips on a
+     gallery-grey bench, nothing else visible so each is judged in isolation. */
+  :root {
+    --bg: #E9E8E4;
+    --fg: #191919;
+    --muted: #6E6A63;
+    --surface: #F5F4F1;
+    --border: #CFCCC4;
+    --accent: #3B5BDB;
+    --like: #2F9E44;
+    --dislike: #D63333;
+    --btn: #6E6E6E;
+    --chip-border: rgba(0,0,0,0.14);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1B1D;
+      --fg: #ECECEA;
+      --muted: #9C988F;
+      --surface: #242427;
+      --border: #3A3A3F;
+      --accent: #7C93FF;
+      --like: #3FBF5F;
+      --dislike: #FF6B6B;
+      --chip-border: rgba(255,255,255,0.18);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1B1D;
+    --fg: #ECECEA;
+    --muted: #9C988F;
+    --surface: #242427;
+    --border: #3A3A3F;
+    --accent: #7C93FF;
+    --like: #3FBF5F;
+    --dislike: #FF6B6B;
+    --chip-border: rgba(255,255,255,0.18);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-top: 24px;
+    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- header ---- */
+  header .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .stats {
+    display: flex;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 14px;
+  }
+  .bar > div {
+    height: 100%;
+    background: var(--accent);
+    width: 0;
+    transition: width 0.25s ease;
+  }
+
+  /* ---- review stage ---- */
+  #review {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0 24px;
+  }
+  .index-line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .index {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: clamp(56px, 16vw, 92px);
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .index-total {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 20px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .swatches {
+    display: flex;
+    gap: 14px;
+    margin-top: 26px;
+  }
+  .swatch {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chip {
+    aspect-ratio: 1;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--chip-border);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .hex {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: clamp(11px, 2.6vw, 14px);
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+  .hint {
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .hint kbd {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 1px 6px;
+    color: var(--fg);
+  }
+
+  /* ---- controls ---- */
+  .controls {
+    display: flex;
+    gap: 14px;
+    margin-top: 30px;
+  }
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.06s ease, filter 0.12s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .btn.dislike { background: var(--btn); }
+  .btn.like { background: var(--btn); }
+  .btn.active { filter: brightness(1.18); box-shadow: 0 0 0 2px var(--fg) inset; }
+  .sub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+  }
+  .textbtn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .textbtn:hover { color: var(--fg); }
+  .textbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .textbtn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ---- results ---- */
+  #results { flex: 1; display: flex; flex-direction: column; padding: 40px 0 24px; }
+  .res-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .res-count { font-size: 20px; font-weight: 600; }
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .result-num {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .result-strip { display: flex; gap: 5px; }
+  .result-chip { flex: 1; aspect-ratio: 1; border-radius: 5px; border: 1px solid var(--chip-border); }
+  .empty { color: var(--muted); font-size: 15px; margin-top: 24px; max-width: 40ch; }
+  .results-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .btn.primary { background: var(--accent); flex: 0 0 auto; padding: 13px 22px; }
+  .btn.ghost { background: var(--surface); color: var(--fg); border: 1px solid var(--border); flex: 0 0 auto; padding: 13px 22px; }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .res-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+  .save-status { margin-top: 12px; font-size: 14px; color: var(--muted); min-height: 1.2em; }
+  .save-status.ok { color: var(--like); }
+  .save-status.err { color: var(--dislike); }
+
+  /* ---- toast ---- */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(22px, env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px);
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 20;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 460px) {
+    .swatches { gap: 8px; }
+    .controls { gap: 10px; }
+    .btn { padding: 14px 10px; font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="row">
+      <h1>Final Selection</h1>
+      <div class="stats">
+        <span id="hdr-position"></span>
+        <span id="hdr-liked"></span>
+        <span id="hdr-disliked"></span>
+      </div>
+    </div>
+    <div class="bar"><div id="bar-fill"></div></div>
+  </header>
+
+  <section id="review">
+    <div class="index-line">
+      <span class="index" id="index-num"></span>
+      <span class="index-total" id="index-total"></span>
+    </div>
+    <div class="swatches" id="swatches"></div>
+    <div class="hint">
+      <kbd>&larr;</kbd> or <kbd>D</kbd> skip &nbsp;&middot;&nbsp;
+      <kbd>&rarr;</kbd> or <kbd>L</kbd> choose &nbsp;&middot;&nbsp;
+      <kbd>Backspace</kbd> back
+    </div>
+    <div class="controls">
+      <button class="btn dislike" id="btn-dislike">Skip</button>
+      <button class="btn like" id="btn-like">Choose</button>
+    </div>
+    <div class="sub">
+      <button class="textbtn" id="btn-back" disabled>&larr; Back</button>
+      <button class="textbtn" id="btn-finish">Finish early</button>
+    </div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="res-head">
+      <span class="res-count" id="res-count"></span>
+      <div class="res-buttons">
+        <button class="btn primary" id="btn-save">Save final 10</button>
+        <button class="btn ghost" id="btn-copy">Copy JSON</button>
+      </div>
+    </div>
+    <div class="save-status" id="save-status" role="status"></div>
+    <div class="results-grid" id="results-grid"></div>
+    <div class="results-actions">
+      <button class="textbtn" id="btn-review">&larr; Keep reviewing</button>
+      <button class="textbtn" id="btn-restart">Start over</button>
+    </div>
+  </section>
+</div>
+
+<textarea id="copybuf" hidden></textarea>
+<div id="toast" role="status"></div>
+
+<script>
+
+const PALETTES = [{"i":10,"colors":["#E06040","#FFE0A0","#303040","#A0D0FF","#406040"],"seed":["#E06040","#FFE0A0"],"score":0.2977},{"i":28,"colors":["#303040","#806040","#A0C0E0","#F0E0C0","#E06040"],"seed":["#303040","#806040"],"score":0.2677},{"i":47,"colors":["#404050","#80A0C0","#FFC0A0","#608050","#D04070"],"seed":["#404050","#80A0C0"],"score":0.2466},{"i":51,"colors":["#202040","#E06040","#C0E0FF","#502030","#A08070"],"seed":["#202040","#E06040"],"score":0.246},{"i":52,"colors":["#C04040","#FFFFA0","#304060","#6090FF","#506020"],"seed":["#C04040","#FFFFA0"],"score":0.2454},{"i":55,"colors":["#807040","#C0B0A0","#7080A0","#709070","#F0C040"],"seed":["#807040","#C0B0A0"],"score":0.2445},{"i":59,"colors":["#603020","#806040","#304060","#304030","#F0E0C0"],"seed":["#603020","#806040"],"score":0.2399},{"i":62,"colors":["#E0A060","#FFFFA0","#303060","#804000","#60A0E0"],"seed":["#E0A060","#FFFFA0"],"score":0.2395},{"i":68,"colors":["#80C0E0","#C08040","#206080","#FFE0B0","#E00000"],"seed":["#80C0E0","#C08040"],"score":0.2377},{"i":69,"colors":["#806040","#E04040","#606080","#209060","#C0FF70"],"seed":["#806040","#E04040"],"score":0.2357},{"i":74,"colors":["#404030","#E0C090","#E05020","#704040","#90A080"],"seed":["#404030","#E0C090"],"score":0.2341},{"i":75,"colors":["#305020","#A03030","#A0C060","#104030","#606010"],"seed":["#305020","#A03030"],"score":0.2338},{"i":76,"colors":["#FF6060","#FFD080","#204040","#70F0E0","#506020"],"seed":["#FF6060","#FFD080"],"score":0.2327},{"i":77,"colors":["#402020","#FFD000","#8090A0","#FFFFA0","#304030"],"seed":["#402020","#FFD000"],"score":0.2325},{"i":79,"colors":["#C0E0FF","#FF6060","#203060","#A070A0","#806040"],"seed":["#C0E0FF","#FF6060"],"score":0.2324},{"i":80,"colors":["#80A090","#D0C090","#403020","#A09030","#D08050"],"seed":["#80A090","#D0C090"],"score":0.232},{"i":93,"colors":["#303040","#FFC080","#B090A0","#803030","#FF8010"],"seed":["#303040","#FFC080"],"score":0.2272},{"i":99,"colors":["#604020","#FFE0A0","#B0C0E0","#F0A000","#303060"],"seed":["#604020","#FFE0A0"],"score":0.2256}];
+const KEY = "palette-final-v1";
+const SAVE_URL = location.protocol === "file:" ? "http://localhost:8000/save-final" : "/save-final";
+const MAX = 10;
+const N = PALETTES.length;
+let votes = {};
+let pos = 0;
+let showingResults = false;
+
+const $ = (id) => document.getElementById(id);
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const o = JSON.parse(raw);
+      if (o && typeof o === "object") {
+        if (o.votes) votes = o.votes;
+        if (typeof o.pos === "number") pos = o.pos;
+      }
+    }
+  } catch (e) {}
+  pos = Math.max(0, Math.min(pos, N - 1));
+}
+
+function saveState() {
+  try { localStorage.setItem(KEY, JSON.stringify({ votes, pos })); } catch (e) {}
+}
+
+function counts() {
+  let like = 0, dislike = 0;
+  for (const v of Object.values(votes)) {
+    if (v === "like") like++;
+    else if (v === "dislike") dislike++;
+  }
+  return { like, dislike };
+}
+
+function likeCount() {
+  return PALETTES.filter((p) => votes[p.i] === "like").length;
+}
+
+function updateHeader() {
+  const c = counts();
+  $("hdr-position").textContent = (pos + 1) + " of " + N;
+  $("hdr-liked").textContent = likeCount() + " / " + MAX + " chosen";
+  $("hdr-disliked").textContent = c.dislike + " skipped";
+  $("bar-fill").style.width = ((likeCount() / MAX) * 100) + "%";
+}
+
+function renderReview() {
+  showingResults = false;
+  $("review").hidden = false;
+  $("results").hidden = true;
+
+  const p = PALETTES[pos];
+  $("index-num").textContent = String(pos + 1).padStart(2, "0");
+  $("index-total").textContent = "/ " + N;
+
+  const wrap = $("swatches");
+  wrap.innerHTML = "";
+  p.colors.forEach((c) => {
+    const sw = document.createElement("div");
+    sw.className = "swatch";
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.style.background = c;
+    const hex = document.createElement("div");
+    hex.className = "hex";
+    hex.textContent = c;
+    sw.append(chip, hex);
+    wrap.append(sw);
+  });
+
+  const cur = votes[PALETTES[pos].i];
+  $("btn-like").classList.toggle("active", cur === "like");
+  $("btn-dislike").classList.toggle("active", cur === "dislike");
+  $("btn-like").disabled = cur !== "like" && likeCount() >= MAX;
+  $("btn-back").disabled = pos === 0;
+  updateHeader();
+}
+
+function vote(action) {
+  const i = PALETTES[pos].i;
+  if (action === "like") {
+    const cur = votes[i];
+    if (cur !== "like" && likeCount() >= MAX) {
+      toast("Already chose " + MAX + " — un-like one first");
+      return;
+    }
+  }
+  votes[i] = action;
+  saveState();
+  if (lastSavedFile !== null) resetSaveButton();
+  if (action === "like" && likeCount() >= MAX) {
+    renderResults();
+    return;
+  }
+  if (pos < N - 1) { pos++; renderReview(); }
+  else renderResults();
+}
+
+function back() {
+  if (pos > 0) { pos--; saveState(); renderReview(); }
+}
+
+function renderResults() {
+  showingResults = true;
+  $("review").hidden = true;
+  $("results").hidden = false;
+
+  const liked = PALETTES.filter((p) => votes[p.i] === "like");
+  $("res-count").textContent = liked.length + " of " + MAX + " chosen";
+
+  const grid = $("results-grid");
+  grid.innerHTML = "";
+  if (liked.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "Nothing chosen yet. Go back and pick your " + MAX + ".";
+    grid.append(empty);
+  } else {
+    liked.forEach((p) => {
+      const card = document.createElement("div");
+      card.className = "result-card";
+      const num = document.createElement("div");
+      num.className = "result-num";
+      num.textContent = "No. " + p.i;
+      const strip = document.createElement("div");
+      strip.className = "result-strip";
+      p.colors.forEach((c) => {
+        const s = document.createElement("div");
+        s.className = "result-chip";
+        s.style.background = c;
+        strip.append(s);
+      });
+      card.append(num, strip);
+      grid.append(card);
+    });
+  }
+
+  const ready = liked.length === MAX;
+  $("btn-save").disabled = !ready;
+  if (!ready) setSaveStatus("Choose " + (MAX - liked.length) + " more to reach " + MAX + ".", "");
+  updateHeader();
+}
+
+function likedJSON() {
+  return PALETTES
+    .filter((p) => votes[p.i] === "like")
+    .map((p) => ({ index: p.i, colors: p.colors, seed: p.seed, score: p.score }));
+}
+
+async function copyResults() {
+  const txt = JSON.stringify(likedJSON(), null, 2);
+  try {
+    await navigator.clipboard.writeText(txt);
+    toast("Copied " + likedJSON().length + " palettes");
+  } catch (e) {
+    const buf = $("copybuf");
+    buf.value = txt;
+    buf.hidden = false;
+    buf.select();
+    try {
+      document.execCommand("copy");
+      toast("Copied to clipboard");
+    } catch (e2) {
+      toast("Copy blocked — select and copy the text");
+    }
+    buf.hidden = true;
+  }
+}
+
+let lastSavedFile = null;
+
+function setSaveStatus(msg, cls) {
+  const el = $("save-status");
+  el.textContent = msg;
+  el.className = "save-status" + (cls ? " " + cls : "");
+}
+
+async function saveResults() {
+  const palettes = likedJSON();
+  if (palettes.length !== MAX) {
+    setSaveStatus("Pick exactly " + MAX + " palettes first.", "err");
+    return;
+  }
+  const btn = $("btn-save");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  setSaveStatus("Saving…", "");
+  try {
+    const res = await fetch(SAVE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ palettes }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || ("HTTP " + res.status));
+    }
+    const data = await res.json();
+    lastSavedFile = data.file;
+    setSaveStatus("Saved " + data.count + " palettes → " + data.file, "ok");
+    btn.textContent = "Saved ✓";
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Save final 10";
+    setSaveStatus(
+      "Could not save — start the server (python scripts/palette/review_server.py) and open http://localhost:8000/final",
+      "err"
+    );
+  }
+}
+
+function resetSaveButton() {
+  lastSavedFile = null;
+  const btn = $("btn-save");
+  btn.disabled = false;
+  btn.textContent = "Save final 10";
+  setSaveStatus("", "");
+}
+
+function startOver() {
+  votes = {};
+  pos = 0;
+  saveState();
+  resetSaveButton();
+  renderReview();
+}
+
+function goBack() {
+  pos = Math.min(pos, N - 1);
+  renderReview();
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function onKey(e) {
+  if (showingResults || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === "ArrowRight" || k.toLowerCase() === "l") {
+    e.preventDefault();
+    vote("like");
+  } else if (k === "ArrowLeft" || k.toLowerCase() === "d") {
+    e.preventDefault();
+    vote("dislike");
+  } else if (k === "Backspace") {
+    e.preventDefault();
+    back();
+  }
+}
+
+function init() {
+  loadState();
+  if (likeCount() >= MAX || Object.keys(votes).length === N) renderResults();
+  else renderReview();
+
+  $("btn-like").onclick = () => vote("like");
+  $("btn-dislike").onclick = () => vote("dislike");
+  $("btn-back").onclick = back;
+  $("btn-finish").onclick = renderResults;
+  $("btn-copy").onclick = copyResults;
+  $("btn-save").onclick = saveResults;
+  $("btn-review").onclick = goBack;
+  $("btn-restart").onclick = startOver;
+  window.addEventListener("keydown", onKey);
+}
+
+init();
+
+</script>
